@@ -488,6 +488,11 @@ func findLocalModules(l ulog.Logger, mainPkgs []*bbinternal.Package) (map[string
 			}
 
 			if lm, ok := localModules[p.Module.Path]; ok && lm.m.Dir != p.Module.Dir {
+				// u-root will **always** conflict
+				if p.Module.Path == "github.com/u-root/u-root" {
+					l.Printf("%s depends on %s @ %s: Using local version to build it", mainPkg.Pkg.PkgPath, p.Module.Path, moduleVersionIdentifier(p.Module))
+					return
+				}
 				fmt.Fprintln(os.Stderr, "")
 				l.Printf("Conflicting module dependencies on %s:", p.Module.Path)
 				l.Printf("  %s depends on %s @ %s", mainPkg.Pkg.PkgPath, p.Module.Path, moduleVersionIdentifier(p.Module))
